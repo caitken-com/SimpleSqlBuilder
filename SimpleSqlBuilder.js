@@ -946,7 +946,7 @@ class SimpleSqlBuilder
 	 */
 	static fromJson(payload)
 	{
-		let sql = new SqlBuilder();
+		let sql = new SimpleSqlBuilder();
 
 		if ('select' in payload) sql.select(payload.select);
 		if ('insert' in payload) sql.insert(payload.insert);
