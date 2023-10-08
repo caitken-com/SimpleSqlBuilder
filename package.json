@@ -1,6 +1,6 @@
 {
   "name": "@caitken-com/simple-sql-builder",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Simple Query Builder",
   "main": "SimpleSqlBuilder.js",
   "scripts": {
