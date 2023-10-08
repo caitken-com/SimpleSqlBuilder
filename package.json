@@ -1,0 +1,16 @@
+{
+  "name": "@caitken-com/simple-sql-builder",
+  "version": "1.0.0",
+  "description": "Simple SQL Builder",
+  "main": "SimpleSqlBuilder.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "sql",
+    "json",
+    "builder"
+  ],
+  "author": "Christopher Aitken",
+  "license": "MIT"
+}
