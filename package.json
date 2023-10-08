@@ -1,15 +1,17 @@
 {
   "name": "@caitken-com/simple-sql-builder",
   "version": "1.0.0",
-  "description": "Simple SQL Builder",
+  "description": "Simple Query Builder",
   "main": "SimpleSqlBuilder.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": "github:caitken-com/SimpleSqlBuilder",
   "keywords": [
     "sql",
     "json",
-    "builder"
+    "builder",
+    "query"
   ],
   "author": "Christopher Aitken",
   "license": "MIT"
