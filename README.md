@@ -144,13 +144,16 @@ let query = new SimpleSqlBuilder()
     'table': {'users': 'user'},
     'columns': ['user.*']
 })
-.joins({
-    'type': 'left',
-    'table': {'orders': 'order'},
-    'conditions': [
-        ['order.user_id', '=', 'user.id']
-    ]
-});
+.joins([
+    {
+        'type': 'left',
+        'table': {'orders': 'order'},
+        'conditions': [
+            ['order.user_id', '=', 'user.id']
+        ]
+    },
+    // Repeat for each join...
+]);
 ```
 
 
