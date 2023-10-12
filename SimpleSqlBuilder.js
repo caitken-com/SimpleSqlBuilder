@@ -54,13 +54,14 @@ class SimpleSqlBuilder
 	 */
 	select(payload)
 	{
-		if (!('table' in payload)) throw Error('Select: Missing table');
+		if (!('table' in payload) && !('query' in payload)) throw Error('Select: Missing table');
 		if (!('columns' in payload)) throw Error('Select: Missing columns');
 
 		this.sql_mode = 'select';
 		this.sql_select = {
-			'table': this.table(payload.table),
+			'table': ('table' in payload) ? this.table(payload.table) : null,
 			'columns': payload.columns,
+			'query': ('query' in payload) ? payload.query : null,
 		};
 
 		return this;
@@ -142,12 +143,13 @@ class SimpleSqlBuilder
 		{
 			if (!('type' in payload[i])) throw Error('Joins: Missing type');
 			if (!('table' in payload[i])) throw Error('Joins: Missing table');
-			if (!('conditions' in payload[i])) throw Error('Joins: Missing conditions');
+			if (!('conditions' in payload[i]) && !('using' in payload[i])) throw Error('Joins: Missing conditions');
 
 			this.sql_joins.push({
 				'type': payload[i].type,
 				'table': this.table(payload[i].table),
-				'conditions': payload[i].conditions,
+				'conditions': ('conditions' in payload[i]) ? payload[i].conditions : null,
+				'using': ('using' in payload[i]) ? payload[i].using : null,
 			});
 		}
 
@@ -356,7 +358,8 @@ class SimpleSqlBuilder
 		let columns = this.processColumns(this.sql_select.columns);
 		let query = '';
 
-		if (typeof this.sql_select.table == 'object')
+		// `table` AS `alias`
+		if (typeof this.sql_select.table == 'object' && this.sql_select.table !== null)
 		{
 			for (let i in this.sql_select.table)
 			{
@@ -364,9 +367,19 @@ class SimpleSqlBuilder
 				alias = this.sql_select.table[i];
 			}
 		}
-		else
+		// `table`
+		else if (this.sql_select.table !== null)
 		{
 			table = this.sql_select.table;
+		}
+		// (query) AS `alias`
+		else if (this.sql_select.query !== null)
+		{
+			for (let i in this.sql_select.query)
+			{
+				table = `(${this.sql_select.query[i]})`;
+				alias = this.table(i);
+			}
 		}
 
 		query += `SELECT ${columns.join(`,\n`)}\n`;
@@ -487,7 +500,7 @@ class SimpleSqlBuilder
 	{
 		let table = null;
 		let alias = null;
-		let conditions = this.processConditions(join.conditions);
+		let conditions = (join.conditions !== null) ? this.processConditions(join.conditions) : null;
 		let query = '';
 
 		if (typeof join.table == 'object')
@@ -504,7 +517,20 @@ class SimpleSqlBuilder
 		}
 
 		query += `${String(join.type).toUpperCase()} JOIN ${table}${(alias) ? ` AS ${alias}` : ''}\n`;
-		query += `ON ${conditions.join(`\nAND `)}\n`;
+
+		if (conditions !== null)
+		{
+			query += `ON ${conditions.join(`\nAND `)}\n`;
+		}
+		else if (join.using !== null)
+		{
+			for (let i in join.using)
+			{
+				join.using[i] = this.identifier(join.using[i], true);
+			}
+
+			query += `USING (${join.using.join(', ')})\n`;
+		}
 
 		return query;
 	}

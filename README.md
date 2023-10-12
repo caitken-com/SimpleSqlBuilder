@@ -25,12 +25,14 @@ Takes an *{object}* with the following keys:
 
 | param | type | comment |
 |---|---|---|
-| table | *{string/object}* | `'table_name'` / `{'table_name': 'alias'}` |
+| table | *{string/object}* | `'table_name'` / `{'table_name': 'alias'}` ^ |
 | columns | *{string[]}* | List of columns to fetch |
+| query | *{object}* | [optional] Pre-built inner query. ^`table` isn't required with this option.  `{'alias': 'pre-built query'}` |
 
 Returns self, chainable.
 
 ```
+// Simple query example
 let query = new SimpleSqlBuilder()
 .select({
     'table': {'users': 'user'},
@@ -39,7 +41,75 @@ let query = new SimpleSqlBuilder()
         'user.last_name',
         'YEAR(user.date_added) AS alumni'
     ]
-});
+})
+.build();
+
+/** Output:
+SELECT `user`.`first_name`, `user`.`last_name`, YEAR(`user`.`date_added`) AS `alumni`
+FROM `users` AS `user`
+*/
+---
+
+
+// Inner query example
+let inner = new SimpleSqlBuilder()
+.select({
+    'table': {'orders': 't'},
+    'columns': [
+        'MAX(t.date_added) AS date_added',
+    ]
+})
+.where([
+    ['t.type', '=', '?'],
+])
+.group([
+    't.type',
+])
+.params([
+    'Fish',
+])
+.build();
+
+// Main/outer query
+let query = new SimpleSqlBuilder()
+.select({
+    'query': {'joiner': inner},
+    'columns': [
+        'order.*',
+    ]
+})
+.joins([
+    {
+        'type': 'inner',
+        'table': { 'orders': 'order' },
+        'using': [
+            'date_added'
+        ]
+    }
+])
+.where([
+    ['order.type', '=', '?'],
+])
+.group([
+    'order.type'
+])
+.params([
+    'Fish'
+])
+.build();
+
+/* Output:
+SELECT `order`.*
+FROM (
+    SELECT MAX(`t`.`date_added`) AS `date_added`
+    FROM `orders` AS `t`
+    WHERE `t`.`type` = 'Fish'
+    GROUP BY `t`.`type`
+) AS `joiner`
+INNER JOIN `orders` AS `order` USING (`date_added`)
+WHERE `order`.`type` = 'Fish'
+GROUP BY `order`.`type`
+*/
 ```
 
 
@@ -51,7 +121,7 @@ Takes an *{object}* with the following keys:
 |---|---|---|
 | table | *{string}* | `'table_name'` |
 | columns | *{object}* | `{column: value}` pairs |
-| duplicates | *{string}* | Optional update clause on duplicate. **Caution: string not escaped** |
+| duplicates | *{string}* | [optional] Update clause on duplicate. **Caution: string not escaped** |
 
 Returns self, chainable.
 
@@ -63,7 +133,8 @@ let query = new SimpleSqlBuilder()
         'first_name', '?',
         'last_name', '?',
         'age': '?'
-    }
+    },
+    'duplicates': 'age = age + 1'
 })
 .params([
     'John',
@@ -134,7 +205,8 @@ Takes an *{object[]}* with the following keys:
 |---|---|---|
 | type | *{string}* | `inner` / `outer` / `left` / `right` / `cross` |
 | table | *{string/object}* | `'table_name'` / `{'table_name': 'alias'}` |
-| conditions | *{array}* | @see `where` for more information |
+| conditions | *{array}* | @see `where` for more information ^ |
+| using | *{string[]}* | [Optional] List of columns from inner query. ^`conditions` not required with this option. |
 
 Returns self, chainable.
 
