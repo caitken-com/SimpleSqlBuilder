@@ -31,7 +31,7 @@ Takes an *{object}* with the following keys:
 
 Returns self, chainable.
 
-```
+```js
 // Simple query example
 let query = new SimpleSqlBuilder()
 .select({
@@ -125,7 +125,7 @@ Takes an *{object}* with the following keys:
 
 Returns self, chainable.
 
-```
+```js
 let query = new SimpleSqlBuilder()
 .insert({
     'table': 'users',
@@ -154,7 +154,7 @@ Takes an *{object}* with the following keys:
 
 Returns self, chainable.
 
-```
+```js
 let query = new SimpleSqlBuilder()
 .delete({
     'table': {'users': 'user'}
@@ -179,7 +179,7 @@ Takes an *{object}* with the following keys:
 
 Returns self, chainable.
 
-```
+```js
 let query = new SimpleSqlBuilder()
 .update({
     'table': {'users': 'user'},
@@ -210,7 +210,7 @@ Takes an *{object[]}* with the following keys:
 
 Returns self, chainable.
 
-```
+```js
 let query = new SimpleSqlBuilder()
 .select({
     'table': {'users': 'user'},
@@ -239,7 +239,7 @@ Takes an *{array}* of `strings` or `objects`:
 
 Returns self, chainable.
 
-```
+```js
 let query = new SimpleSqlBuilder()
 .order([
     'user.id',
@@ -258,7 +258,7 @@ Takes an *{array}* of `strings`:
 
 Returns self, chainable.
 
-```
+```js
 let query = new SimpleSqlBuilder()
 .group([
     'user.age',
@@ -279,7 +279,7 @@ Takes an *{array}* of any of the following conditions:
 
 Returns self, chainable.
 
-```
+```js
 let query = new SimpleSqlBuilder()
 .where([
     ['user.active', '=', true],
@@ -330,7 +330,7 @@ Takes either a *{number} / {array}*: `10` / `[offset, limit]`
 
 Returns self, chainable.
 
-```
+```js
 // Limit
 let query = new SimpleSqlBuilder()
 .limit(10);
@@ -349,7 +349,7 @@ Takes either *{array}* of values, or *{object}* of `key:value` pairs.
 
 Returns self, chainable.
 
-```
+```js
 // Numeric array of params
 let query = new SimpleSqlBuilder()
 .where([
@@ -385,7 +385,7 @@ Static method takes *{JSON}* with any of the *above public methods* as keys and 
 
 Returns *{string}* The completed SQL statement.
 
-```
+```js
 let query = SimpleSqlBuilder.fromJson({
     'select': {
         'table': {'users': 'user'},
@@ -410,7 +410,7 @@ console.log(query);
 
 Returns *{string}* The completed SQL statement.
 
-```
+```js
 let query = new SimpleSqlBuilder()
 .select({
     'table': {'users': 'user'},
